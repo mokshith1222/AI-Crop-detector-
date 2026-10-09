@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plant Disease Detection & Solution Server</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <a href="#" class="brand">
+      <div class="brand-icon">🌿</div>
+      <div>
+        <div class="brand-title">PlantGuard AI</div>
+        <div class="brand-subtitle">Disease Diagnostic & Remedy Server</div>
+      </div>
+    </a>
+    <div class="status-badge">
+      <span class="pulse-dot"></span>
+      <span>AI Server Online</span>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="container">
+    
+    <!-- Hero Header -->
+    <section class="hero-section">
+      <h1 class="hero-title">Plant Disease Detection & Solution</h1>
+      <p class="hero-description">
+        Upload or capture a plant leaf image to run real-time deep learning AI image classification, detect plant diseases, and get instant organic remedies and agricultural solutions.
+      </p>
+    </section>
+
+    <!-- Scanner & Dashboard Grid -->
+    <div class="dashboard-grid">
+      
+      <!-- Upload Card -->
+      <div class="glass-card">
+        <h2 class="card-title">
+          <span>📷</span> Image Scanner & Upload
+        </h2>
+
+        <div class="dropzone" id="dropzone">
+          <span class="dropzone-icon">🍃</span>
+          <div class="dropzone-text">Drag & drop your leaf image here</div>
+          <div class="dropzone-subtext">Supports JPG, PNG, WEBP (Max 10MB)</div>
+          <button class="btn-upload" onclick="document.getElementById('fileInput').click()">Browse Files</button>
+          <input type="file" id="fileInput" accept="image/*" style="display: none;">
+        </div>
+
+        <!-- Camera Box -->
+        <div class="camera-box" id="cameraBox">
+          <video id="webcam" autoplay playsinline></video>
+          <button class="btn-snap" id="snapBtn">📸 Capture Photo</button>
+        </div>
+
+        <div style="margin-top: 1rem; text-align: center;">
+          <button class="btn-upload" id="cameraBtn" style="background: rgba(255,255,255,0.1); border: 1px solid var(--border-color);">
+            📷 Use Live Camera
+          </button>
+        </div>
+
+        <!-- Image Preview -->
+        <div class="preview-container" id="previewContainer">
+          <button class="btn-reset" id="resetBtn" title="Remove image">✕</button>
+          <img id="previewImage" class="preview-image" alt="Uploaded leaf preview">
+        </div>
+
+        <!-- Sample Leaf Test Gallery -->
+        <div class="sample-bar">
+          <div class="sample-title">⚡ Or Test With Sample Images:</div>
+          <div class="sample-grid">
+            <div class="sample-card" data-sample="peach_scab">
+              <span class="sample-emoji">🍑</span>
+              <div class="sample-label">Peach Scab</div>
+            </div>
+            <div class="sample-card" data-sample="apple_scab">
+              <span class="sample-emoji">🍎</span>
+              <div class="sample-label">Apple Scab</div>
+            </div>
+            <div class="sample-card" data-sample="tomato_blight">
+              <span class="sample-emoji">🍅</span>
+              <div class="sample-label">Tomato Blight</div>
+            </div>
+            <div class="sample-card" data-sample="healthy_leaf">
+              <span class="sample-emoji">🌿</span>
+              <div class="sample-label">Healthy Leaf</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results & Diagnosis Card -->
+      <div class="glass-card">
+        <h2 class="card-title">
+          <span>🩺</span> AI Diagnostic & Solution Report
+        </h2>
+
+        <!-- Initial Placeholder -->
+        <div class="result-placeholder" id="resultPlaceholder">
+          <div class="placeholder-icon">🔬</div>
+          <h3>No Leaf Image Scanned Yet</h3>
+          <p style="margin-top: 0.5rem; font-size: 0.9rem;">
+            Upload a leaf photo or pick a sample on the left to view deep learning disease diagnosis, symptoms, and treatment.
+          </p>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div class="spinner" id="spinner"></div>
+
+        <!-- Result Content -->
+        <div class="result-content" id="resultContent">
+          
+          <div class="prediction-header">
+            <div class="crop-name" id="cropName">Apple</div>
+            <div class="disease-name" id="diseaseName">Apple Scab</div>
+            <div class="status-tags" id="statusTags"></div>
+
+            <div class="confidence-box">
+              <div class="confidence-header">
+                <span>AI Confidence Score</span>
+                <span id="confidenceValue" style="color: #6ee7b7;">98.4%</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progressBarFill"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Solution Tabs -->
+          <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="symptoms">🔍 Symptoms</button>
+            <button class="tab-btn" data-tab="management">💊 Treatment</button>
+            <button class="tab-btn" data-tab="organic">🌿 Organic Remedy</button>
+            <button class="tab-btn" data-tab="prevention">🛡️ Prevention</button>
+          </div>
+
+          <div class="tab-pane active" id="symptomsPane"></div>
+          <div class="tab-pane" id="managementPane"></div>
+          <div class="tab-pane" id="organicPane"></div>
+          <div class="tab-pane" id="preventionPane"></div>
+
+          <!-- Candidates List -->
+          <div class="candidates-list" id="candidatesList"></div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Disease Library Catalog -->
+    <section class="library-section">
+      <div class="library-header">
+        <div>
+          <h2 style="font-size: 1.6rem; font-weight: 800;">📚 Disease & Crop Solutions Library</h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Browse 38 supported plant diseases across Apple, Cherry, Corn, Grape, Peach, Potato, Tomato & more</p>
+        </div>
+        <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search crop or disease...">
+      </div>
+
+      <div class="disease-grid" id="diseaseGrid"></div>
+    </section>
+
+  </div>
+
+  <footer>
+    Plant Disease Detection and Solution Server &bull; Powered by TensorFlow Lite AI & Flask
+  </footer>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
