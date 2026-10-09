@@ -10,15 +10,28 @@ from PIL import Image
 import numpy as np
 
 # Import disease database
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+if CURRENT_DIR not in sys.path:
+    sys.path.append(CURRENT_DIR)
 from diseases_data import DISEASE_DATABASE
 
-app = Flask(__name__, static_folder='static', template_folder='templates')
+app = Flask(
+    __name__,
+    static_folder=os.path.join(CURRENT_DIR, 'static'),
+    template_folder=os.path.join(CURRENT_DIR, 'templates')
+)
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(CURRENT_DIR)
 ASSETS_DIR = os.path.join(BASE_DIR, "FarmerFriendApp", "app", "src", "main", "assets")
-MODEL_PATH = os.path.join(ASSETS_DIR, "model.tflite")
-LABELS_PATH = os.path.join(ASSETS_DIR, "labels.txt")
+
+# Check server folder first, fallback to FarmerFriendApp assets
+MODEL_PATH = os.path.join(CURRENT_DIR, "model.tflite")
+if not os.path.exists(MODEL_PATH):
+    MODEL_PATH = os.path.join(ASSETS_DIR, "model.tflite")
+
+LABELS_PATH = os.path.join(CURRENT_DIR, "labels.txt")
+if not os.path.exists(LABELS_PATH):
+    LABELS_PATH = os.path.join(ASSETS_DIR, "labels.txt")
 
 # Global variables for model and labels
 interpreter = None
@@ -72,6 +85,12 @@ def load_model():
             print(f"[ERROR] tflite_runtime also failed: {ex}")
             model_loaded = False
             return False
+
+# Initialize model on startup
+try:
+    load_model()
+except Exception as _e:
+    pass
 
 def preprocess_image(image: Image.Image, target_size=(200, 200)):
     """Preprocess image to match model input requirements (200x200 RGB float32 0..1)"""
@@ -158,6 +177,8 @@ def index():
 
 @app.route("/api/health", methods=["GET"])
 def health():
+    if not model_loaded:
+        load_model()
     return jsonify({
         "status": "online",
         "model_loaded": model_loaded,
@@ -177,6 +198,8 @@ def get_diseases():
 @app.route("/api/predict", methods=["POST"])
 def predict():
     try:
+        if not model_loaded:
+            load_model()
         image = None
         if "file" in request.files:
             file = request.files["file"]
